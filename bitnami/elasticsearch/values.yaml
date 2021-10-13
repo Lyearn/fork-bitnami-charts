@@ -398,6 +398,20 @@ master:
   ## @param master.sidecars Extra sidecar containers to add to the Elasticsearch master-eligible pod(s)
   ##
   sidecars: []
+  ## @param extraVolumes A list of volumes to be added to the pod
+  ## Example Use Case: mount ssl certificates when elasticsearch has tls enabled
+  ## extraVolumes:
+  ##   - name: es-certs
+  ##     secret:
+  ##       defaultMode: 420
+  ##       secretName: es-certs
+  extraVolumes: []
+  ## @param extraVolumeMounts A list of volume mounts to be added to the pod
+  ## extraVolumeMounts:
+  ##   - name: es-certs
+  ##     mountPath: /certs
+  ##     readOnly: true
+  extraVolumeMounts: []
   ## Enable persistence using Persistent Volume Claims
   ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
   ##
@@ -878,6 +892,20 @@ data:
   ## @param data.sidecars Extra sidecar containers to add to the Elasticsearch data pod(s)
   ##
   sidecars: []
+  ## @param extraVolumes A list of volumes to be added to the pod
+  ## Example Use Case: mount ssl certificates when elasticsearch has tls enabled
+  ## extraVolumes:
+  ##   - name: es-certs
+  ##     secret:
+  ##       defaultMode: 420
+  ##       secretName: es-certs
+  extraVolumes: []
+  ## @param extraVolumeMounts A list of volume mounts to be added to the pod
+  ## extraVolumeMounts:
+  ##   - name: es-certs
+  ##     mountPath: /certs
+  ##     readOnly: true
+  extraVolumeMounts: []
   ## Enable persistence using Persistent Volume Claims
   ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
   ##
@@ -1057,6 +1085,20 @@ ingest:
     requests:
       cpu: 25m
       memory: 256Mi
+  ## @param extraVolumes A list of volumes to be added to the pod
+  ## Example Use Case: mount ssl certificates when elasticsearch has tls enabled
+  ## extraVolumes:
+  ##   - name: es-certs
+  ##     secret:
+  ##       defaultMode: 420
+  ##       secretName: es-certs
+  extraVolumes: []
+  ## @param extraVolumeMounts A list of volume mounts to be added to the pod
+  ## extraVolumeMounts:
+  ##   - name: es-certs
+  ##     mountPath: /certs
+  ##     readOnly: true
+  extraVolumeMounts: []
   ## Elasticsearch ingest container's startup probe
   ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
   ## @param ingest.startupProbe.enabled Enable/disable the startup probe (ingest nodes pod)
