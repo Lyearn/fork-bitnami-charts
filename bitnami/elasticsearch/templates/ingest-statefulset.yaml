@@ -218,6 +218,9 @@ spec:
             {{- if .Values.extraVolumeMounts }}
             {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
             {{- end }}
+            {{- if .Values.ingest.extraVolumeMounts }}
+            {{- toYaml .Values.ingest.extraVolumeMounts | nindent 12 }}
+            {{- end }}
             {{- if .Values.initScripts }}
             - name: custom-init-scripts
               mountPath: /docker-entrypoint-initdb.d/init-scripts
@@ -247,6 +250,9 @@ spec:
         {{- end }}
         {{- if .Values.extraVolumes }}
         {{- toYaml .Values.extraVolumes | nindent 8 }}
+        {{- end }}
+        {{- if .Values.ingest.extraVolumes }}
+        {{- toYaml .Values.ingest.extraVolumes | nindent 8 }}
         {{- end }}
         {{- if .Values.initScripts }}
         - name: custom-init-scripts
