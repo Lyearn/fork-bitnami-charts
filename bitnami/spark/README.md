@@ -68,15 +68,25 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Spark parameters
 
-| Name                | Description                                      | Value                 |
-| ------------------- | ------------------------------------------------ | --------------------- |
-| `image.registry`    | Spark image registry                             | `docker.io`           |
-| `image.repository`  | Spark image repository                           | `bitnami/spark`       |
-| `image.tag`         | Spark image tag (immutable tags are recommended) | `3.1.2-debian-10-r99` |
-| `image.pullPolicy`  | Spark image pull policy                          | `IfNotPresent`        |
-| `image.pullSecrets` | Specify docker-registry secret names as an array | `[]`                  |
-| `image.debug`       | Enable image debug mode                          | `false`               |
-| `hostNetwork`       | Enable HOST Network                              | `false`               |
+| Name                | Description                                      | Value                |
+| ------------------- | ------------------------------------------------ | -------------------- |
+| `image.registry`    | Spark image registry                             | `docker.io`          |
+| `image.repository`  | Spark image repository                           | `bitnami/spark`      |
+| `image.tag`         | Spark image tag (immutable tags are recommended) | `3.2.0-debian-10-r2` |
+| `image.pullPolicy`  | Spark image pull policy                          | `IfNotPresent`       |
+| `image.pullSecrets` | Specify docker-registry secret names as an array | `[]`                 |
+| `image.debug`       | Enable image debug mode                          | `false`              |
+| `hostNetwork`       | Enable HOST Network                              | `false`              |
+
+
+### RBAC parameters
+
+| Name                                          | Description                                            | Value  |
+| --------------------------------------------- | ------------------------------------------------------ | ------ |
+| `serviceAccount.create`                       | Enable the creation of a ServiceAccount for Spark pods | `true` |
+| `serviceAccount.name`                         | The name of the ServiceAccount to use.                 | `""`   |
+| `serviceAccount.annotations`                  | Annotations for Spark Service Account                  | `{}`   |
+| `serviceAccount.automountServiceAccountToken` | Automount API credentials for a service account.       | `true` |
 
 
 ### Spark master parameters
@@ -278,7 +288,7 @@ To submit an application to the Apache Spark cluster, use the `spark-submit` scr
 The command below illustrates the process of deploying one of the sample applications included with Apache Spark. Replace the MASTER-IP-ADDRESS and MASTER-PORT placeholders with the correct master IP address and port for your deployment.
 
 ```bash
-$ ./bin/spark-submit --class org.apache.spark.examples.SparkPi --master spark://MASTER-IP-ADDRESS:MASTER-PORT  --deploy-mode cluster  ./examples/jars/spark-examples_2.11-2.4.3.jar 1000
+$ ./bin/spark-submit --class org.apache.spark.examples.SparkPi --conf spark.kubernetes.container.image=bitnami/spark:3 --master spark://MASTER-IP-ADDRESS:MASTER-PORT --deploy-mode cluster ./examples/jars/spark-examples_2.11-2.4.3.jar 1000
 ```
 
 For a complete walkthrough of the process using a custom application, refer to the [detailed Apache Spark tutorial](https://docs.bitnami.com/tutorials/process-data-spark-kubernetes/).

@@ -84,6 +84,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `service.loadBalancerSourceRanges` | haproxy service Load Balancer sources             | `[]`           |
 | `service.externalTrafficPolicy`    | haproxy service external traffic policy           | `Cluster`      |
 | `service.annotations`              | Additional custom annotations for haproxy service | `{}`           |
+| `service.labels`                   | Additional custom labels for haproxy service      | `{}`           |
 
 
 ### HAProxy Parameters
@@ -92,7 +93,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | ------------------------------------ | ----------------------------------------------------------------------------------------- | -------------------- |
 | `image.registry`                     | HAProxy image registry                                                                    | `docker.io`          |
 | `image.repository`                   | HAProxy image repository                                                                  | `bitnami/haproxy`    |
-| `image.tag`                          | HAProxy image tag (immutable tags are recommended)                                        | `2.4.7-debian-10-r1` |
+| `image.tag`                          | HAProxy image tag (immutable tags are recommended)                                        | `2.4.8-debian-10-r0` |
 | `image.pullPolicy`                   | HAProxy image pull policy                                                                 | `IfNotPresent`       |
 | `image.pullSecrets`                  | HAProxy image pull secrets                                                                | `[]`                 |
 | `replicaCount`                       | Number of haproxy replicas to deploy                                                      | `1`                  |

@@ -65,20 +65,22 @@ Additionally, if `persistence.resourcePolicy` is set to `keep`, you should manua
 
 ### General parameters
 
-| Name                        | Description                                                                                                              | Value           |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------------- |
-| `nameOverride`              | String to partially override common.names.fullname template (will maintain the release name)                             | `""`            |
-| `fullnameOverride`          | String to fully override common.names.fullname template                                                                  | `""`            |
-| `clusterDomain`             | Kubernetes Cluster Domain                                                                                                | `cluster.local` |
-| `commonAnnotations`         | Common annotations to add to all resources (sub-charts are not considered). Evaluated as a template                      | `{}`            |
-| `commonLabels`              | Common labels to add to all resources (sub-charts are not considered). Evaluated as a template                           | `{}`            |
-| `extraDeploy`               | Array of extra objects to deploy with the release (evaluated as a template)                                              | `[]`            |
-| `serviceAccount.enabled`    | Enable service account (Note: Service Account will only be automatically created if `serviceAccount.name` is not set)    | `false`         |
-| `serviceAccount.name`       | Name of an already existing service account. Setting this value disables the automatic service account creation          | `""`            |
-| `topologySpreadConstraints` | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template | `{}`            |
-| `diagnosticMode.enabled`    | Enable diagnostic mode (all probes will be disabled and the command will be overridden)                                  | `false`         |
-| `diagnosticMode.command`    | Command to override all containers in the deployment                                                                     | `[]`            |
-| `diagnosticMode.args`       | Args to override all containers in the deployment                                                                        | `[]`            |
+| Name                        | Description                                                                                                                                 | Value           |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| `nameOverride`              | String to partially override common.names.fullname template (will maintain the release name)                                                | `""`            |
+| `fullnameOverride`          | String to fully override common.names.fullname template                                                                                     | `""`            |
+| `clusterDomain`             | Kubernetes Cluster Domain                                                                                                                   | `cluster.local` |
+| `commonAnnotations`         | Common annotations to add to all resources (sub-charts are not considered). Evaluated as a template                                         | `{}`            |
+| `commonLabels`              | Common labels to add to all resources (sub-charts are not considered). Evaluated as a template                                              | `{}`            |
+| `extraDeploy`               | Array of extra objects to deploy with the release (evaluated as a template)                                                                 | `[]`            |
+| `serviceAccount.enabled`    | Enable service account (Note: Service Account will only be automatically created if `serviceAccount.name` is not set)                       | `false`         |
+| `serviceAccount.name`       | Name of an already existing service account. Setting this value disables the automatic service account creation                             | `""`            |
+| `psp.create`                | Whether to create a PodSecurityPolicy. WARNING: PodSecurityPolicy is deprecated in Kubernetes v1.21 or later, unavailable in v1.25 or later | `false`         |
+| `rbac.create`               | Create Role and RoleBinding (required for PSP to work)                                                                                      | `false`         |
+| `topologySpreadConstraints` | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template                    | `{}`            |
+| `diagnosticMode.enabled`    | Enable diagnostic mode (all probes will be disabled and the command will be overridden)                                                     | `false`         |
+| `diagnosticMode.command`    | Command to override all containers in the deployment                                                                                        | `[]`            |
+| `diagnosticMode.args`       | Args to override all containers in the deployment                                                                                           | `[]`            |
 
 
 ### PostgreSQL with Repmgr parameters
@@ -87,7 +89,7 @@ Additionally, if `persistence.resourcePolicy` is set to `keep`, you should manua
 | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
 | `postgresqlImage.registry`                      | PostgreSQL with Repmgr image registry                                                                                                                                                                         | `docker.io`                 |
 | `postgresqlImage.repository`                    | PostgreSQL with Repmgr image repository                                                                                                                                                                       | `bitnami/postgresql-repmgr` |
-| `postgresqlImage.tag`                           | PostgreSQL with Repmgr image tag                                                                                                                                                                              | `11.13.0-debian-10-r57`     |
+| `postgresqlImage.tag`                           | PostgreSQL with Repmgr image tag                                                                                                                                                                              | `11.14.0-debian-10-r0`      |
 | `postgresqlImage.pullPolicy`                    | PostgreSQL with Repmgr image pull policy                                                                                                                                                                      | `IfNotPresent`              |
 | `postgresqlImage.pullSecrets`                   | Specify docker-registry secret names as an array                                                                                                                                                              | `[]`                        |
 | `postgresqlImage.debug`                         | Specify if debug logs should be enabled                                                                                                                                                                       | `false`                     |
@@ -205,7 +207,7 @@ Additionally, if `persistence.resourcePolicy` is set to `keep`, you should manua
 | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------- |
 | `pgpoolImage.registry`                      | Pgpool image registry                                                                                              | `docker.io`           |
 | `pgpoolImage.repository`                    | Pgpool image repository                                                                                            | `bitnami/pgpool`      |
-| `pgpoolImage.tag`                           | Pgpool image tag                                                                                                   | `4.2.5-debian-10-r26` |
+| `pgpoolImage.tag`                           | Pgpool image tag                                                                                                   | `4.2.5-debian-10-r60` |
 | `pgpoolImage.pullPolicy`                    | Pgpool image pull policy                                                                                           | `IfNotPresent`        |
 | `pgpoolImage.pullSecrets`                   | Specify docker-registry secret names as an array                                                                   | `[]`                  |
 | `pgpoolImage.debug`                         | Specify if debug logs should be enabled                                                                            | `false`               |
@@ -322,7 +324,7 @@ Additionally, if `persistence.resourcePolicy` is set to `keep`, you should manua
 | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
 | `metricsImage.registry`                      | PostgreSQL Prometheus exporter image registry                                                                                                             | `docker.io`                 |
 | `metricsImage.repository`                    | PostgreSQL Prometheus exporter image repository                                                                                                           | `bitnami/postgres-exporter` |
-| `metricsImage.tag`                           | PostgreSQL Prometheus exporter image tag                                                                                                                  | `0.10.0-debian-10-r85`      |
+| `metricsImage.tag`                           | PostgreSQL Prometheus exporter image tag                                                                                                                  | `0.10.0-debian-10-r120`     |
 | `metricsImage.pullPolicy`                    | PostgreSQL Prometheus exporter image pull policy                                                                                                          | `IfNotPresent`              |
 | `metricsImage.pullSecrets`                   | Specify docker-registry secret names as an array                                                                                                          | `[]`                        |
 | `metricsImage.debug`                         | Specify if debug logs should be enabled                                                                                                                   | `false`                     |
@@ -374,8 +376,8 @@ Additionally, if `persistence.resourcePolicy` is set to `keep`, you should manua
 | --------------------------------------------- | --------------------------------------------------- | ----------------------- |
 | `volumePermissionsImage.registry`             | Init container volume-permissions image registry    | `docker.io`             |
 | `volumePermissionsImage.repository`           | Init container volume-permissions image repository  | `bitnami/bitnami-shell` |
-| `volumePermissionsImage.tag`                  | Init container volume-permissions image tag         | `10-debian-10-r218`     |
-| `volumePermissionsImage.pullPolicy`           | Init container volume-permissions image pull policy | `Always`                |
+| `volumePermissionsImage.tag`                  | Init container volume-permissions image tag         | `10-debian-10-r252`     |
+| `volumePermissionsImage.pullPolicy`           | Init container volume-permissions image pull policy | `IfNotPresent`          |
 | `volumePermissionsImage.pullSecrets`          | Specify docker-registry secret names as an array    | `[]`                    |
 | `volumePermissions.enabled`                   | Enable init container to adapt volume permissions   | `false`                 |
 | `volumePermissions.securityContext.runAsUser` | Init container volume-permissions User ID           | `0`                     |
@@ -610,6 +612,31 @@ $ helm upgrade my-release bitnami/postgresql-ha \
 > Note: you need to substitute the placeholders _[POSTGRESQL_PASSWORD]_, and _[REPMGR_PASSWORD]_ with the values obtained from instructions in the installation notes.
 
 > Note: As general rule, it is always wise to do a backup before the upgrading procedures.
+
+### To 8.0.0
+
+A new major version of repmgr (5.3) was included. To upgrade to this major version, it's necessary to upgrade the repmgr extension installed on the database. To do so, follow the steps below:
+
+- Reduce your PostgreSQL setup to one replica (primary node) and upgrade to `8.0.0`, enabling the repmgr extension upgrade:
+
+```bash
+$ helm upgrade my-release --version 8.0.0 bitnami/postgresql-ha \
+    --set postgresql.password=[POSTGRESQL_PASSWORD] \
+    --set postgresql.repmgrPassword=[REPMGR_PASSWORD] \
+    --set postgresql.replicaCount=1 \
+    --set postgresql.upgradeRepmgrExtension=true
+```
+
+- Scale your PostgreSQL setup to the original number of replicas:
+
+```bash
+$ helm upgrade my-release --version 8.0.0 bitnami/postgresql-ha \
+    --set postgresql.password=[POSTGRESQL_PASSWORD] \
+    --set postgresql.repmgrPassword=[REPMGR_PASSWORD] \
+    --set postgresql.replicaCount=[NUMBER_OF_REPLICAS]
+```
+
+> Note: you need to substitute the placeholders _[POSTGRESQL_PASSWORD]_, and _[REPMGR_PASSWORD]_ with the values obtained from instructions in the installation notes.
 
 ### To 6.4.0
 

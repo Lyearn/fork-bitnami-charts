@@ -68,6 +68,7 @@ $ helm delete --purge my-release
 | `nameOverride`           | String to partially override common.names.fullname template (will maintain the release name) | `""`            |
 | `fullnameOverride`       | String to fully override common.names.fullname template                                      | `""`            |
 | `clusterDomain`          | Kubernetes cluster domain                                                                    | `cluster.local` |
+| `extraDeploy`            | Array of extra objects to deploy with the release                                            | `[]`            |
 | `diagnosticMode.enabled` | Enable diagnostic mode (all probes will be disabled and the command will be overridden)      | `false`         |
 | `diagnosticMode.command` | Command to override all containers in the deployment                                         | `["sleep"]`     |
 | `diagnosticMode.args`    | Args to override all containers in the deployment                                            | `["infinity"]`  |
@@ -79,7 +80,7 @@ $ helm delete --purge my-release
 | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
 | `image.registry`                           | Elasticsearch image registry                                                                                                                        | `docker.io`                    |
 | `image.repository`                         | Elasticsearch image repository                                                                                                                      | `bitnami/elasticsearch`        |
-| `image.tag`                                | Elasticsearch image tag (immutable tags are recommended)                                                                                            | `7.14.2-debian-10-r1`          |
+| `image.tag`                                | Elasticsearch image tag (immutable tags are recommended)                                                                                            | `7.15.2-debian-10-r0`          |
 | `image.pullPolicy`                         | Elasticsearch image pull policy                                                                                                                     | `IfNotPresent`                 |
 | `image.pullSecrets`                        | Elasticsearch image pull secrets                                                                                                                    | `[]`                           |
 | `image.debug`                              | Enable image debug mode                                                                                                                             | `false`                        |
@@ -137,6 +138,7 @@ $ helm delete --purge my-release
 | `master.nodeAffinityPreset.key`             | Master-eligible Node label key to match Ignored if `affinity` is set.                                                                                                                                                                   | `""`                |
 | `master.nodeAffinityPreset.values`          | Master-eligible Node label values to match. Ignored if `affinity` is set.                                                                                                                                                               | `[]`                |
 | `master.affinity`                           | Master-eligible Affinity for pod assignment                                                                                                                                                                                             | `{}`                |
+| `master.priorityClassName`                  | Master pods Priority Class Name                                                                                                                                                                                                         | `""`                |
 | `master.nodeSelector`                       | Master-eligible Node labels for pod assignment                                                                                                                                                                                          | `{}`                |
 | `master.tolerations`                        | Master-eligible Tolerations for pod assignment                                                                                                                                                                                          | `[]`                |
 | `master.topologySpreadConstraints`          | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template                                                                                                                | `[]`                |
@@ -210,6 +212,7 @@ $ helm delete --purge my-release
 | `coordinating.nodeAffinityPreset.key`             | Coordinating Node label key to match Ignored if `affinity` is set.                                                        | `""`            |
 | `coordinating.nodeAffinityPreset.values`          | Coordinating Node label values to match. Ignored if `affinity` is set.                                                    | `[]`            |
 | `coordinating.affinity`                           | Coordinating Affinity for pod assignment                                                                                  | `{}`            |
+| `coordinating.priorityClassName`                  | Coordinating pods Priority Class Name                                                                                     | `""`            |
 | `coordinating.nodeSelector`                       | Coordinating Node labels for pod assignment                                                                               | `{}`            |
 | `coordinating.tolerations`                        | Coordinating Tolerations for pod assignment                                                                               | `[]`            |
 | `coordinating.topologySpreadConstraints`          | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template  | `[]`            |
@@ -275,6 +278,7 @@ $ helm delete --purge my-release
 | `data.nodeAffinityPreset.key`                | Data Node label key to match Ignored if `affinity` is set.                                                                                        | `""`                |
 | `data.nodeAffinityPreset.values`             | Data Node label values to match. Ignored if `affinity` is set.                                                                                    | `[]`                |
 | `data.affinity`                              | Data Affinity for pod assignment                                                                                                                  | `{}`                |
+| `data.priorityClassName`                     | Data pods Priority Class Name                                                                                                                     | `""`                |
 | `data.nodeSelector`                          | Data Node labels for pod assignment                                                                                                               | `{}`                |
 | `data.tolerations`                           | Data Tolerations for pod assignment                                                                                                               | `[]`                |
 | `data.topologySpreadConstraints`             | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template                          | `[]`                |
@@ -345,6 +349,7 @@ $ helm delete --purge my-release
 | `ingest.nodeAffinityPreset.key`             | Ingest Node label key to match Ignored if `affinity` is set.                                                             | `""`            |
 | `ingest.nodeAffinityPreset.values`          | Ingest Node label values to match. Ignored if `affinity` is set.                                                         | `[]`            |
 | `ingest.affinity`                           | Ingest Affinity for pod assignment                                                                                       | `{}`            |
+| `ingest.priorityClassName`                  | Ingest pods Priority Class Name                                                                                          | `""`            |
 | `ingest.nodeSelector`                       | Ingest Node labels for pod assignment                                                                                    | `{}`            |
 | `ingest.tolerations`                        | Ingest Tolerations for pod assignment                                                                                    | `[]`            |
 | `ingest.topologySpreadConstraints`          | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template | `[]`            |
@@ -386,51 +391,51 @@ $ helm delete --purge my-release
 
 ### Curator parameters
 
-| Name                                         | Description                                                                                                              | Value                           |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------- |
-| `curator.enabled`                            | Enable Elasticsearch Curator cron job                                                                                    | `false`                         |
-| `curator.name`                               | Elasticsearch Curator pod name                                                                                           | `curator`                       |
-| `curator.image.registry`                     | Elasticsearch Curator image registry                                                                                     | `docker.io`                     |
-| `curator.image.repository`                   | Elasticsearch Curator image repository                                                                                   | `bitnami/elasticsearch-curator` |
-| `curator.image.tag`                          | Elasticsearch Curator image tag                                                                                          | `5.8.4-debian-10-r130`          |
-| `curator.image.pullPolicy`                   | Elasticsearch Curator image pull policy                                                                                  | `IfNotPresent`                  |
-| `curator.image.pullSecrets`                  | Elasticsearch Curator image pull secrets                                                                                 | `[]`                            |
-| `curator.cronjob.schedule`                   | Schedule for the CronJob                                                                                                 | `0 1 * * *`                     |
-| `curator.cronjob.annotations`                | Annotations to add to the cronjob                                                                                        | `{}`                            |
-| `curator.cronjob.concurrencyPolicy`          | `Allow,Forbid,Replace` concurrent jobs                                                                                   | `""`                            |
-| `curator.cronjob.failedJobsHistoryLimit`     | Specify the number of failed Jobs to keep                                                                                | `""`                            |
-| `curator.cronjob.successfulJobsHistoryLimit` | Specify the number of completed Jobs to keep                                                                             | `""`                            |
-| `curator.cronjob.jobRestartPolicy`           | Control the Job restartPolicy                                                                                            | `Never`                         |
-| `curator.schedulerName`                      | Name of the k8s scheduler (other than default)                                                                           | `""`                            |
-| `curator.podAnnotations`                     | Annotations to add to the pod                                                                                            | `{}`                            |
-| `curator.podLabels`                          | Extra labels to add to Pod                                                                                               | `{}`                            |
-| `curator.podAffinityPreset`                  | Curator Pod affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`                              | `""`                            |
-| `curator.podAntiAffinityPreset`              | Curator Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`                         | `""`                            |
-| `curator.nodeAffinityPreset.type`            | Curator Node affinity preset type. Ignored if `affinity` is set. Allowed values: `soft` or `hard`                        | `""`                            |
-| `curator.nodeAffinityPreset.key`             | Curator Node label key to match Ignored if `affinity` is set.                                                            | `""`                            |
-| `curator.nodeAffinityPreset.values`          | Curator Node label values to match. Ignored if `affinity` is set.                                                        | `[]`                            |
-| `curator.initContainers`                     | Extra init containers to add to the Elasticsearch coordinating-only pod(s)                                               | `[]`                            |
-| `curator.sidecars`                           | Extra sidecar containers to add to the Elasticsearch ingest pod(s)                                                       | `[]`                            |
-| `curator.affinity`                           | Curator Affinity for pod assignment                                                                                      | `{}`                            |
-| `curator.nodeSelector`                       | Curator Node labels for pod assignment                                                                                   | `{}`                            |
-| `curator.tolerations`                        | Curator Tolerations for pod assignment                                                                                   | `[]`                            |
-| `curator.topologySpreadConstraints`          | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template | `[]`                            |
-| `curator.rbac.enabled`                       | Enable RBAC resources                                                                                                    | `false`                         |
-| `curator.serviceAccount.create`              | Create a default serviceaccount for elasticsearch curator                                                                | `true`                          |
-| `curator.serviceAccount.name`                | Name for elasticsearch curator serviceaccount                                                                            | `""`                            |
-| `curator.psp.create`                         | Create pod security policy resources                                                                                     | `false`                         |
-| `curator.hooks`                              | Whether to run job on selected hooks                                                                                     | `{}`                            |
-| `curator.dryrun`                             | Run Curator in dry-run mode                                                                                              | `false`                         |
-| `curator.command`                            | Command to execute                                                                                                       | `["curator"]`                   |
-| `curator.env`                                | Environment variables to add to the cronjob container                                                                    | `{}`                            |
-| `curator.configMaps.action_file_yml`         | Contents of the Curator action_file.yml                                                                                  | `""`                            |
-| `curator.configMaps.config_yml`              | Contents of the Curator config.yml (overrides config)                                                                    | `""`                            |
-| `curator.resources.limits`                   | The resources limits for the container                                                                                   | `{}`                            |
-| `curator.resources.requests`                 | The requested resources for the container                                                                                | `{}`                            |
-| `curator.priorityClassName`                  | Priority Class Name                                                                                                      | `""`                            |
-| `curator.extraVolumes`                       | Extra volumes                                                                                                            | `[]`                            |
-| `curator.extraVolumeMounts`                  | Mount extra volume(s)                                                                                                    | `[]`                            |
-| `curator.extraInitContainers`                | DEPRECATED. Use `curator.initContainers` instead. Init containers to add to the cronjob container                        | `[]`                            |
+| Name                                         | Description                                                                                                                                 | Value                           |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| `curator.enabled`                            | Enable Elasticsearch Curator cron job                                                                                                       | `false`                         |
+| `curator.name`                               | Elasticsearch Curator pod name                                                                                                              | `curator`                       |
+| `curator.image.registry`                     | Elasticsearch Curator image registry                                                                                                        | `docker.io`                     |
+| `curator.image.repository`                   | Elasticsearch Curator image repository                                                                                                      | `bitnami/elasticsearch-curator` |
+| `curator.image.tag`                          | Elasticsearch Curator image tag                                                                                                             | `5.8.4-debian-10-r179`          |
+| `curator.image.pullPolicy`                   | Elasticsearch Curator image pull policy                                                                                                     | `IfNotPresent`                  |
+| `curator.image.pullSecrets`                  | Elasticsearch Curator image pull secrets                                                                                                    | `[]`                            |
+| `curator.cronjob.schedule`                   | Schedule for the CronJob                                                                                                                    | `0 1 * * *`                     |
+| `curator.cronjob.annotations`                | Annotations to add to the cronjob                                                                                                           | `{}`                            |
+| `curator.cronjob.concurrencyPolicy`          | `Allow,Forbid,Replace` concurrent jobs                                                                                                      | `""`                            |
+| `curator.cronjob.failedJobsHistoryLimit`     | Specify the number of failed Jobs to keep                                                                                                   | `""`                            |
+| `curator.cronjob.successfulJobsHistoryLimit` | Specify the number of completed Jobs to keep                                                                                                | `""`                            |
+| `curator.cronjob.jobRestartPolicy`           | Control the Job restartPolicy                                                                                                               | `Never`                         |
+| `curator.schedulerName`                      | Name of the k8s scheduler (other than default)                                                                                              | `""`                            |
+| `curator.podAnnotations`                     | Annotations to add to the pod                                                                                                               | `{}`                            |
+| `curator.podLabels`                          | Extra labels to add to Pod                                                                                                                  | `{}`                            |
+| `curator.podAffinityPreset`                  | Curator Pod affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`                                                 | `""`                            |
+| `curator.podAntiAffinityPreset`              | Curator Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`                                            | `""`                            |
+| `curator.nodeAffinityPreset.type`            | Curator Node affinity preset type. Ignored if `affinity` is set. Allowed values: `soft` or `hard`                                           | `""`                            |
+| `curator.nodeAffinityPreset.key`             | Curator Node label key to match Ignored if `affinity` is set.                                                                               | `""`                            |
+| `curator.nodeAffinityPreset.values`          | Curator Node label values to match. Ignored if `affinity` is set.                                                                           | `[]`                            |
+| `curator.initContainers`                     | Extra init containers to add to the Elasticsearch coordinating-only pod(s)                                                                  | `[]`                            |
+| `curator.sidecars`                           | Extra sidecar containers to add to the Elasticsearch ingest pod(s)                                                                          | `[]`                            |
+| `curator.affinity`                           | Curator Affinity for pod assignment                                                                                                         | `{}`                            |
+| `curator.nodeSelector`                       | Curator Node labels for pod assignment                                                                                                      | `{}`                            |
+| `curator.tolerations`                        | Curator Tolerations for pod assignment                                                                                                      | `[]`                            |
+| `curator.topologySpreadConstraints`          | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template                    | `[]`                            |
+| `curator.rbac.enabled`                       | Enable RBAC resources                                                                                                                       | `false`                         |
+| `curator.serviceAccount.create`              | Create a default serviceaccount for elasticsearch curator                                                                                   | `true`                          |
+| `curator.serviceAccount.name`                | Name for elasticsearch curator serviceaccount                                                                                               | `""`                            |
+| `curator.psp.create`                         | Whether to create a PodSecurityPolicy. WARNING: PodSecurityPolicy is deprecated in Kubernetes v1.21 or later, unavailable in v1.25 or later | `false`                         |
+| `curator.hooks`                              | Whether to run job on selected hooks                                                                                                        | `{}`                            |
+| `curator.dryrun`                             | Run Curator in dry-run mode                                                                                                                 | `false`                         |
+| `curator.command`                            | Command to execute                                                                                                                          | `["curator"]`                   |
+| `curator.env`                                | Environment variables to add to the cronjob container                                                                                       | `{}`                            |
+| `curator.configMaps.action_file_yml`         | Contents of the Curator action_file.yml                                                                                                     | `""`                            |
+| `curator.configMaps.config_yml`              | Contents of the Curator config.yml (overrides config)                                                                                       | `""`                            |
+| `curator.resources.limits`                   | The resources limits for the container                                                                                                      | `{}`                            |
+| `curator.resources.requests`                 | The requested resources for the container                                                                                                   | `{}`                            |
+| `curator.priorityClassName`                  | Curator Pods Priority Class Name                                                                                                            | `""`                            |
+| `curator.extraVolumes`                       | Extra volumes                                                                                                                               | `[]`                            |
+| `curator.extraVolumeMounts`                  | Mount extra volume(s)                                                                                                                       | `[]`                            |
+| `curator.extraInitContainers`                | DEPRECATED. Use `curator.initContainers` instead. Init containers to add to the cronjob container                                           | `[]`                            |
 
 
 ### Metrics parameters
@@ -441,7 +446,7 @@ $ helm delete --purge my-release
 | `metrics.name`                               | Metrics pod name                                                                                                         | `metrics`                        |
 | `metrics.image.registry`                     | Metrics exporter image registry                                                                                          | `docker.io`                      |
 | `metrics.image.repository`                   | Metrics exporter image repository                                                                                        | `bitnami/elasticsearch-exporter` |
-| `metrics.image.tag`                          | Metrics exporter image tag                                                                                               | `1.2.1-debian-10-r81`            |
+| `metrics.image.tag`                          | Metrics exporter image tag                                                                                               | `1.3.0-debian-10-r19`            |
 | `metrics.image.pullPolicy`                   | Metrics exporter image pull policy                                                                                       | `IfNotPresent`                   |
 | `metrics.image.pullSecrets`                  | Metrics exporter image pull secrets                                                                                      | `[]`                             |
 | `metrics.extraArgs`                          | Extra arguments to add to the default exporter command                                                                   | `[]`                             |
@@ -488,8 +493,8 @@ $ helm delete --purge my-release
 | `sysctlImage.enabled`            | Enable kernel settings modifier image       | `true`                  |
 | `sysctlImage.registry`           | Kernel settings modifier image registry     | `docker.io`             |
 | `sysctlImage.repository`         | Kernel settings modifier image repository   | `bitnami/bitnami-shell` |
-| `sysctlImage.tag`                | Kernel settings modifier image tag          | `10-debian-10-r199`     |
-| `sysctlImage.pullPolicy`         | Kernel settings modifier image pull policy  | `Always`                |
+| `sysctlImage.tag`                | Kernel settings modifier image tag          | `10-debian-10-r248`     |
+| `sysctlImage.pullPolicy`         | Kernel settings modifier image pull policy  | `IfNotPresent`          |
 | `sysctlImage.pullSecrets`        | Kernel settings modifier image pull secrets | `[]`                    |
 | `sysctlImage.resources.limits`   | The resources limits for the container      | `{}`                    |
 | `sysctlImage.resources.requests` | The requested resources for the container   | `{}`                    |
@@ -502,8 +507,8 @@ $ helm delete --purge my-release
 | `volumePermissions.enabled`            | Enable init container that changes volume permissions in the data directory (for cases where the default k8s `runAsUser` and `fsUser` values do not work) | `false`                 |
 | `volumePermissions.image.registry`     | Init container volume-permissions image registry                                                                                                          | `docker.io`             |
 | `volumePermissions.image.repository`   | Init container volume-permissions image name                                                                                                              | `bitnami/bitnami-shell` |
-| `volumePermissions.image.tag`          | Init container volume-permissions image tag                                                                                                               | `10-debian-10-r199`     |
-| `volumePermissions.image.pullPolicy`   | Init container volume-permissions image pull policy                                                                                                       | `Always`                |
+| `volumePermissions.image.tag`          | Init container volume-permissions image tag                                                                                                               | `10-debian-10-r248`     |
+| `volumePermissions.image.pullPolicy`   | Init container volume-permissions image pull policy                                                                                                       | `IfNotPresent`          |
 | `volumePermissions.image.pullSecrets`  | Init container volume-permissions image pull secrets                                                                                                      | `[]`                    |
 | `volumePermissions.resources.limits`   | The resources limits for the container                                                                                                                    | `{}`                    |
 | `volumePermissions.resources.requests` | The requested resources for the container                                                                                                                 | `{}`                    |
@@ -561,6 +566,53 @@ You can disable the initContainer using the `sysctlImage.enabled=false` paramete
 
 This Elasticsearch chart contains Kibana as subchart, you can enable it just setting the `global.kibanaEnabled=true` parameter.
 To see the notes with some operational instructions from the Kibana chart, please use the `--render-subchart-notes` as part of your `helm install` command, in this way you can see the Kibana and ES notes in your terminal.
+
+When enabling the bundled kibana subchart, there are a few gotchas that you should be aware of listed below.
+
+#### Elasticsearch rest Encryption
+
+When enabling elasticsearch' rest endpoint encryption you will also need to set `kibana.elasticsearch.security.tls.enabled` to the SAME value along with some additional values shown below for an "out of the box experience":
+
+```yaml
+security:
+  enabled: true
+  # PASSWORD must be the same value passed to elasticsearch to get an "out of the box" experience
+  elasticPassword: "<PASSWORD>"
+  tls:
+    # AutoGenerate TLS certs for elastic
+    autoGenerated: true
+
+kibana:
+  elasticsearch:
+    security:
+      auth:
+        enabled: true
+        # default in the elasticsearch chart is elastic
+        kibanaUsername: "<USERNAME>"
+        kibanaPassword: "<PASSWORD>"
+      tls:
+        # Instruct kibana to connect to elastic over https
+        enabled: true
+        # Bit of a catch 22, as you will need to know the name upfront of your release
+        existingSecret: RELEASENAME-elasticsearch-coordinating-only-crt
+        # As the certs are auto-generated, they are pemCerts so set to true
+        usePemCerts: true
+```
+
+At a bare-minimum, when working with kibana and elasticsearch together the following values MUST be the same, otherwise things will fail:
+
+```yaml
+security:
+  tls:
+    restEncryption: true
+
+# assumes global.kibanaEnabled=true
+kibana:
+  elasticsearch:
+    security:
+      tls:
+        enabled: true
+```
 
 ### Adding extra environment variables
 

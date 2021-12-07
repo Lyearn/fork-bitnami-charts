@@ -68,6 +68,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `fullnameOverride`  | String to fully override discourse.fullname template                                      | `""`  |
 | `commonLabels`      | Labels to be added to all deployed resources                                              | `{}`  |
 | `commonAnnotations` | Annotations to be added to all deployed resources                                         | `{}`  |
+| `extraDeploy`       | Array of extra objects to deploy with the release                                         | `[]`  |
 
 
 ### Service parameters
@@ -91,7 +92,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------- |
 | `image.registry`                               | Discourse image registry                                                                                  | `docker.io`           |
 | `image.repository`                             | Discourse image repository                                                                                | `bitnami/discourse`   |
-| `image.tag`                                    | Discourse image tag                                                                                       | `2.7.8-debian-10-r22` |
+| `image.tag`                                    | Discourse image tag                                                                                       | `2.7.10-debian-10-r0` |
 | `image.pullPolicy`                             | Discourse image pull policy                                                                               | `IfNotPresent`        |
 | `image.pullSecrets`                            | Discourse image pull secrets                                                                              | `[]`                  |
 | `image.debug`                                  | Specify if debug logs should be enabled                                                                   | `false`               |

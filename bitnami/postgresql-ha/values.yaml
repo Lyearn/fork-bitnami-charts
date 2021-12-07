@@ -75,6 +75,18 @@ serviceAccount:
   ## @param serviceAccount.name Name of an already existing service account. Setting this value disables the automatic service account creation
   ##
   name: ""
+## Pod Security Policy
+## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
+## @param psp.create Whether to create a PodSecurityPolicy. WARNING: PodSecurityPolicy is deprecated in Kubernetes v1.21 or later, unavailable in v1.25 or later
+##
+psp:
+  create: false
+## Creates role for ServiceAccount
+## Required for PSP
+## @param rbac.create Create Role and RoleBinding (required for PSP to work)
+##
+rbac:
+  create: false
 ## @param topologySpreadConstraints Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template
 ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods
 ##
@@ -110,7 +122,7 @@ diagnosticMode:
 postgresqlImage:
   registry: docker.io
   repository: bitnami/postgresql-repmgr
-  tag: 11.13.0-debian-10-r57
+  tag: 11.14.0-debian-10-r0
   ## Specify a imagePullPolicy. Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
   ##
@@ -561,7 +573,7 @@ postgresql:
 pgpoolImage:
   registry: docker.io
   repository: bitnami/pgpool
-  tag: 4.2.5-debian-10-r26
+  tag: 4.2.5-debian-10-r60
   ## Specify a imagePullPolicy. Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
   ##
@@ -978,7 +990,7 @@ ldap:
 metricsImage:
   registry: docker.io
   repository: bitnami/postgres-exporter
-  tag: 0.10.0-debian-10-r85
+  tag: 0.10.0-debian-10-r120
   ## Specify a imagePullPolicy. Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
   ##
@@ -1187,11 +1199,11 @@ metrics:
 volumePermissionsImage:
   registry: docker.io
   repository: bitnami/bitnami-shell
-  tag: 10-debian-10-r218
+  tag: 10-debian-10-r252
   ## Specify a imagePullPolicy. Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
   ##
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/

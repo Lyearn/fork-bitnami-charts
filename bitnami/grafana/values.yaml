@@ -53,7 +53,7 @@ commonAnnotations: {}
 image:
   registry: docker.io
   repository: bitnami/grafana
-  tag: 8.2.1-debian-10-r0
+  tag: 8.2.4-debian-10-r0
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -102,6 +102,15 @@ smtp:
   ##   host: mysmtphost.com
   ##
   host: ""
+  ## @param smtp.fromAddress From address
+  ##
+  fromAddress: ""
+  ## @param smtp.fromName From name
+  ##
+  fromName: ""
+  ## @param smtp.skipVerify Enable skip verify
+  ##
+  skipVerify: "false"
   ## @param smtp.existingSecret Name of existing secret containing SMTP credentials (user and password)
   ##
   existingSecret: ""
@@ -144,22 +153,6 @@ ldap:
   ## NOTE: When it's set the ldap.configuration parameter is ignored
   ##
   secretName: ""
-## @param extraEnvVars Array containing extra env vars to configure Grafana
-## For example:
-## extraEnvVars:
-##  - name: GF_DEFAULT_INSTANCE_NAME
-##    value: my-instance
-##
-extraEnvVars: {}
-## @param extraConfigmaps Array to mount extra ConfigMaps to configure Grafana
-## For example:
-## extraConfigmaps:
-##   - name: myconfigmap
-##     mountPath: /opt/bitnami/desired-path
-##     subPath: file-name.extension (optional)
-##     readOnly: true
-##
-extraConfigmaps: {}
 ## Parameters to override the default grafana.ini file.
 ## It is needed to create a configmap or a secret containing the grafana.ini file.
 ## @param config.useGrafanaIniFile Allows to load a `grafana.ini` file
@@ -201,6 +194,13 @@ dashboardsConfigMaps: []
 ##
 datasources:
   secretName: ""
+
+## Create notifiers from a configMap
+## The notifiersName must contain the files
+## @param notifiers.configMapName Name of a ConfigMap containing Grafana notifiers configuration
+##
+notifiers:
+  configMapName: ""
 
 ## @section Grafana Deployment parameters
 
@@ -437,6 +437,22 @@ grafana:
   ## @param grafana.extraEnvVarsSecret Name of existing Secret containing extra env vars for %%MAIN_CONTAINER_NAME%% nodes
   ##
   extraEnvVarsSecret: ""
+  ## @param grafana.extraEnvVars Array containing extra env vars to configure Grafana
+  ## For example:
+  ## extraEnvVars:
+  ##  - name: GF_DEFAULT_INSTANCE_NAME
+  ##    value: my-instance
+  ##
+  extraEnvVars: {}
+  ## @param grafana.extraConfigmaps Array to mount extra ConfigMaps to configure Grafana
+  ## For example:
+  ## extraConfigmaps:
+  ##   - name: myconfigmap
+  ##     mountPath: /opt/bitnami/desired-path
+  ##     subPath: file-name.extension (optional)
+  ##     readOnly: true
+  ##
+  extraConfigmaps: {}
   ## @param grafana.command Override default container command (useful when using custom images)
   ##
   command: []
@@ -688,7 +704,7 @@ imageRenderer:
   image:
     registry: docker.io
     repository: bitnami/grafana-image-renderer
-    tag: 3.2.1-debian-10-r3
+    tag: 3.2.1-debian-10-r33
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
     ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -886,8 +902,8 @@ volumePermissions:
   image:
     registry: docker.io
     repository: bitnami/bitnami-shell
-    tag: "10"
-    pullPolicy: Always
+    tag: 10-debian-10-r252
+    pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
     ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
