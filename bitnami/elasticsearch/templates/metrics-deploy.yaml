@@ -42,15 +42,15 @@ spec:
           {{- else }}
           args:
             {{- if gt (int .Values.coordinating.replicas) 0 }}
-            {{- if .Values.security.enabled }}
             # Prefer coordinating only nodes to do the initial metrics query
+            {{- if .Values.security.enabled }}
             - --es.uri=http://elastic:{{ .Values.security.elasticPassword }}@{{ template "elasticsearch.coordinating.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.coordinating.service.port }}
             {{- else }}
             - --es.uri=http://{{ template "elasticsearch.coordinating.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.coordinating.service.port }}
             {{- end }}
             {{- else }}
+             # Using master nodes as there are no coordinating only nodes
             {{- if .Values.security.enabled }}
-            # Using master nodes as there are no coordinating only nodes
             - --es.uri=http://elastic:{{ .Values.security.elasticPassword }}@{{ include "elasticsearch.master.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.master.service.port }}
             {{- else }}
             - --es.uri=http://{{ include "elasticsearch.master.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.master.service.port }}
