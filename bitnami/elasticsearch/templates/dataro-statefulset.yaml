@@ -1,79 +1,82 @@
 apiVersion: {{ template "common.capabilities.statefulset.apiVersion" . }}
 kind: StatefulSet
 metadata:
-  name: {{ include "elasticsearch.master.fullname" . }}
+  name: {{ include "elasticsearch.dataro.fullname" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: master
+    app.kubernetes.io/component: dataro
     ## Istio Labels: https://istio.io/docs/ops/deployment/requirements/
-    app: master
+    app: dataro
 spec:
   updateStrategy:
-    type: {{ .Values.master.updateStrategy.type }}
-    {{- if (eq "OnDelete" .Values.master.updateStrategy.type) }}
+    type: {{ .Values.dataro.updateStrategy.type }}
+    {{- if (eq "OnDelete" .Values.dataro.updateStrategy.type) }}
     rollingUpdate: null
+    {{- else if .Values.dataro.updateStrategy.rollingUpdatePartition }}
+    rollingUpdate:
+      partition: {{ .Values.dataro.updateStrategy.rollingUpdatePartition }}
     {{- end }}
   selector:
     matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
-      app.kubernetes.io/component: master
+      app.kubernetes.io/component: dataro
   podManagementPolicy: Parallel
-  {{- if not .Values.master.autoscaling.enabled }}
-  replicas: {{ .Values.master.replicas }}
+  {{- if not .Values.dataro.autoscaling.enabled }}
+  replicas: {{ .Values.dataro.replicas }}
   {{- end }}
-  serviceName: {{ template "elasticsearch.master.fullname" . }}
+  serviceName: {{ template "elasticsearch.dataro.fullname" . }}
   template:
     metadata:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
-        app.kubernetes.io/component: master
+        app.kubernetes.io/component: dataro
         ## Istio Labels: https://istio.io/docs/ops/deployment/requirements/
-        app: master
-        {{- if .Values.master.podLabels }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.master.podLabels "context" $) | nindent 8 }}
+        app: dataro
+        {{- if .Values.dataro.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.dataro.podLabels "context" $) | nindent 8 }}
         {{- end }}
       annotations:
-        {{- if and (include "elasticsearch.createTlsSecret" .) (not .Values.security.tls.master.existingSecret) }}
+        {{- if and (include "elasticsearch.createTlsSecret" .) (not .Values.security.tls.dataro.existingSecret) }}
         checksum/tls: {{ include (print $.Template.BasePath "/tls-secret.yaml") . | sha256sum }}
         {{- end }}
-        {{- if .Values.master.podAnnotations }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.master.podAnnotations "context" $) | nindent 8 }}
+        {{- if .Values.dataro.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.dataro.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- include "elasticsearch.imagePullSecrets" . | nindent 6 }}
-      {{- if .Values.master.hostAliases }}
-      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.master.hostAliases "context" $) | nindent 8 }}
+      {{- if .Values.dataro.priorityClassName }}
+      priorityClassName: {{ .Values.dataro.priorityClassName | quote }}
       {{- end }}
-      {{- if .Values.master.schedulerName }}
-      schedulerName: {{ .Values.master.schedulerName }}
-      {{- end }}
-      {{- if .Values.master.priorityClassName }}
-      priorityClassName: {{ .Values.master.priorityClassName | quote }}
-      {{- end }}
-      {{- if .Values.master.affinity }}
-      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.master.affinity "context" $) | nindent 8 }}
+      {{- if .Values.dataro.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.dataro.affinity "context" $) | nindent 8 }}
       {{- else }}
       affinity:
-        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.master.podAffinityPreset "component" "master" "context" $) | nindent 10 }}
-        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.master.podAntiAffinityPreset "component" "master" "context" $) | nindent 10 }}
-        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.master.nodeAffinityPreset.type "key" .Values.master.nodeAffinityPreset.key "values" .Values.master.nodeAffinityPreset.values) | nindent 10 }}
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.dataro.podAffinityPreset "component" "dataro" "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.dataro.podAntiAffinityPreset "component" "dataro" "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.dataro.nodeAffinityPreset.type "key" .Values.dataro.nodeAffinityPreset.key "values" .Values.dataro.nodeAffinityPreset.values) | nindent 10 }}
       {{- end }}
-      {{- if .Values.master.nodeSelector }}
-      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.master.nodeSelector "context" $) | nindent 8 }}
+      {{- if .Values.dataro.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.dataro.hostAliases "context" $) | nindent 8 }}
       {{- end }}
-      {{- if .Values.master.tolerations }}
-      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.master.tolerations "context" $) | nindent 8 }}
+      {{- if .Values.dataro.schedulerName }}
+      schedulerName: {{ .Values.dataro.schedulerName }}
       {{- end }}
-      {{- if .Values.master.topologySpreadConstraints }}
-      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.master.topologySpreadConstraints "context" $) | nindent 8 }}
+      {{- if .Values.dataro.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.dataro.nodeSelector "context" $) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ template "elasticsearch.master.serviceAccountName" . }}
-      {{- if or .Values.master.podSecurityContext.enabled .Values.master.securityContext.enabled }}
+      {{- if .Values.dataro.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.dataro.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.dataro.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.dataro.topologySpreadConstraints "context" $) | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "elasticsearch.dataro.serviceAccountName" . }}
+      {{- if or .Values.dataro.podSecurityContext.enabled .Values.dataro.securityContext.enabled }}
       securityContext:
-        {{- if .Values.master.podSecurityContext.enabled }}
-        {{- omit .Values.master.podSecurityContext "enabled" | toYaml | nindent 8 }}
+        {{- if .Values.dataro.podSecurityContext.enabled }}
+        {{- omit .Values.dataro.podSecurityContext "enabled" | toYaml | nindent 8 }}
         {{- else }}
-        fsGroup: {{ .Values.master.securityContext.fsGroup }}
+        fsGroup: {{ .Values.dataro.securityContext.fsGroup }}
         {{- end }}
       {{- end }}
-      {{- if or .Values.master.initContainers .Values.sysctlImage.enabled (and .Values.volumePermissions.enabled .Values.master.persistence.enabled) }}
+      {{- if or .Values.dataro.initContainers .Values.sysctlImage.enabled (and .Values.volumePermissions.enabled .Values.dataro.persistence.enabled) }}
       initContainers:
         {{- if .Values.sysctlImage.enabled }}
         ## Image that performs the sysctl operation to modify Kernel settings (needed sometimes to avoid boot errors)
@@ -92,7 +95,7 @@ spec:
           resources: {{- toYaml .Values.sysctlImage.resources | nindent 12 }}
           {{- end }}
         {{- end }}
-        {{- if and .Values.volumePermissions.enabled .Values.master.persistence.enabled }}
+        {{- if and .Values.volumePermissions.enabled .Values.dataro.persistence.enabled }}
         - name: volume-permissions
           image: {{ include "elasticsearch.volumePermissions.image" . }}
           imagePullPolicy: {{ .Values.volumePermissions.image.pullPolicy | quote }}
@@ -100,7 +103,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              chown -R {{ .Values.master.securityContext.runAsUser }}:{{ .Values.master.securityContext.fsGroup }} //bitnami/elasticsearch/data
+              chown -R {{ .Values.dataro.securityContext.runAsUser }}:{{ .Values.dataro.securityContext.fsGroup }} //bitnami/elasticsearch/data
           securityContext:
             runAsUser: 0
           {{- if .Values.volumePermissions.resources }}
@@ -110,20 +113,20 @@ spec:
             - name: data
               mountPath: "/bitnami/elasticsearch/data"
         {{- end }}
-        {{- if .Values.master.initContainers }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.master.initContainers "context" $) | nindent 8 }}
+        {{- if .Values.dataro.initContainers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.dataro.initContainers "context" $) | nindent 8 }}
         {{- end }}
       {{- end }}
       containers:
         - name: elasticsearch
           image: {{ include "elasticsearch.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
-          {{- if or .Values.master.containerSecurityContext.enabled .Values.master.securityContext.enabled }}
+          {{- if or .Values.dataro.containerSecurityContext.enabled .Values.dataro.securityContext.enabled }}
           securityContext:
-            {{- if .Values.master.containerSecurityContext.enabled }}
-            {{- omit .Values.master.containerSecurityContext "enabled" | toYaml | nindent 12 }}
-            {{ else }}
-            runAsUser: {{ .Values.master.securityContext.runAsUser }}
+            {{- if .Values.dataro.containerSecurityContext.enabled }}
+            {{- omit .Values.dataro.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+            {{- else }}
+            runAsUser: {{ .Values.dataro.securityContext.runAsUser }}
             {{- end }}
           {{- end }}
           {{- if .Values.diagnosticMode.enabled }}
@@ -147,14 +150,6 @@ spec:
               value: {{ include "elasticsearch.hosts" . | quote }}
             - name: ELASTICSEARCH_TOTAL_NODES
               value: {{ add (ternary .Values.master.autoscaling.minReplicas .Values.master.replicas .Values.master.autoscaling.enabled) (ternary .Values.data.autoscaling.minReplicas .Values.data.replicas .Values.data.autoscaling.enabled) (ternary .Values.dataro.autoscaling.minReplicas .Values.dataro.replicas .Values.dataro.autoscaling.enabled) | quote }}
-            - name: ELASTICSEARCH_CLUSTER_MASTER_HOSTS
-              {{- $elasticsearchMasterFullname := include "elasticsearch.master.fullname" . }}
-              {{- $replicas := int (ternary .Values.master.autoscaling.minReplicas .Values.master.replicas .Values.master.autoscaling.enabled) }}
-              value: {{ range $i, $e := until $replicas }}{{ $elasticsearchMasterFullname }}-{{ $e }} {{ end }}
-            - name: ELASTICSEARCH_MINIMUM_MASTER_NODES
-              value: {{ add (div (ternary .Values.master.autoscaling.minReplicas .Values.master.replicas .Values.master.autoscaling.enabled) 2) 1 | quote }}
-            - name: ELASTICSEARCH_ADVERTISED_HOSTNAME
-              value: "$(MY_POD_NAME).{{ include "elasticsearch.master.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}"
             {{- if .Values.plugins }}
             - name: ELASTICSEARCH_PLUGINS
               value: {{ .Values.plugins | quote }}
@@ -164,11 +159,13 @@ spec:
               value: {{ .Values.snapshotRepoPath | quote }}
             {{- end }}
             - name: ELASTICSEARCH_HEAP_SIZE
-              value: {{ .Values.master.heapSize | quote }}
+              value: {{ .Values.dataro.heapSize | quote }}
             - name: ELASTICSEARCH_IS_DEDICATED_NODE
               value: "yes"
             - name: ELASTICSEARCH_NODE_TYPE
-              value: "master"
+              value: "data"
+            - name: ELASTICSEARCH_ADVERTISED_HOSTNAME
+              value: "$(MY_POD_NAME).{{ include "elasticsearch.dataro.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}"
             - name: ELASTICSEARCH_NODE_ATTRIBUTE_PURPOSE
               value: "$(MY_COMPONENT_NAME)"
             {{- if .Values.security.enabled }}
@@ -194,53 +191,53 @@ spec:
             - name: transport
               containerPort: 9300
           {{- if not .Values.diagnosticMode.enabled }}
-          {{- if .Values.master.startupProbe.enabled }}
+          {{- if .Values.dataro.startupProbe.enabled }}
           startupProbe:
-            initialDelaySeconds: {{ .Values.master.startupProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.master.startupProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.master.startupProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.master.startupProbe.successThreshold }}
-            failureThreshold: {{ .Values.master.startupProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.dataro.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.dataro.startupProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.dataro.startupProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.dataro.startupProbe.successThreshold }}
+            failureThreshold: {{ .Values.dataro.startupProbe.failureThreshold }}
             exec:
               command:
                 - /opt/bitnami/scripts/elasticsearch/healthcheck.sh
-          {{- else if .Values.master.customStartupProbe }}
-          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.master.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.dataro.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.dataro.customStartupProbe "context" $) | nindent 12 }}
           {{- end }}
-          {{- if .Values.master.livenessProbe.enabled }}
+          {{- if .Values.dataro.livenessProbe.enabled }}
           livenessProbe:
-            initialDelaySeconds: {{ .Values.master.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.master.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.master.livenessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.master.livenessProbe.successThreshold }}
-            failureThreshold: {{ .Values.master.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.dataro.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.dataro.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.dataro.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.dataro.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.dataro.livenessProbe.failureThreshold }}
             exec:
               command:
                 - /opt/bitnami/scripts/elasticsearch/healthcheck.sh
-          {{- else if .Values.master.customLivenessProbe }}
-          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.master.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.dataro.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.dataro.customLivenessProbe "context" $) | nindent 12 }}
           {{- end }}
-          {{- if .Values.master.readinessProbe.enabled }}
+          {{- if .Values.dataro.readinessProbe.enabled }}
           readinessProbe:
-            initialDelaySeconds: {{ .Values.master.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.master.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.master.readinessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.master.readinessProbe.successThreshold }}
-            failureThreshold: {{ .Values.master.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.dataro.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.dataro.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.dataro.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.dataro.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.dataro.readinessProbe.failureThreshold }}
             exec:
               command:
                 - /opt/bitnami/scripts/elasticsearch/healthcheck.sh
-          {{- else if .Values.master.customReadinessProbe }}
-          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.master.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.dataro.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.dataro.customReadinessProbe "context" $) | nindent 12 }}
           {{- end }}
           {{- end }}
-          {{- if .Values.master.resources }}
-          resources: {{- toYaml .Values.master.resources | nindent 12 }}
+          {{- if .Values.dataro.resources }}
+          resources: {{- toYaml .Values.dataro.resources | nindent 12 }}
           {{- end }}
           volumeMounts:
             {{- if .Values.config }}
             - mountPath: /opt/bitnami/elasticsearch/config/elasticsearch.yml
-              name: config
+              name: "config"
               subPath: elasticsearch.yml
             {{- end }}
             {{- if .Values.extraConfig }}
@@ -248,8 +245,8 @@ spec:
               name: config
               subPath: my_elasticsearch.yml
             {{- end }}
-            - name: data
-              mountPath: /bitnami/elasticsearch/data
+            - name: "data"
+              mountPath: "/bitnami/elasticsearch/data"
             {{- if .Values.security.enabled }}
             - name: elasticsearch-certificates
               mountPath: /opt/bitnami/elasticsearch/config/certs
@@ -270,19 +267,19 @@ spec:
             - name: custom-init-scripts-secret
               mountPath: /docker-entrypoint-initdb.d/init-scripts-secret
             {{- end }}
-        {{- if .Values.master.sidecars }}
-        {{- include "common.tplvalues.render" ( dict "value" .Values.master.sidecars "context" $) | nindent 8 }}
+        {{- if .Values.dataro.sidecars }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.dataro.sidecars "context" $) | nindent 8 }}
         {{- end }}
       volumes:
         {{- if or .Values.config .Values.extraConfig }}
-        - name: config
+        - name: "config"
           configMap:
-            name: {{ include "common.names.fullname" . }}
+            name: {{ template "common.names.fullname" . }}
         {{- end }}
         {{- if .Values.security.enabled }}
         - name: elasticsearch-certificates
           secret:
-            secretName: {{ include "elasticsearch.master.tlsSecretName" . }}
+            secretName: {{ include "elasticsearch.dataro.tlsSecretName" . }}
             defaultMode: 256
         {{- end }}
         {{- if .Values.extraVolumes }}
@@ -304,32 +301,32 @@ spec:
             secretName: {{ template "elasticsearch.initScriptsSecret" . }}
             defaultMode: 0755
         {{- end }}
-{{- if not .Values.master.persistence.enabled }}
+{{- if not .Values.dataro.persistence.enabled }}
         - name: "data"
           emptyDir: {}
-{{- else if .Values.master.persistence.existingClaim }}
+{{- else if .Values.dataro.persistence.existingClaim }}
         - name: "data"
           persistentVolumeClaim:
-            claimName: {{ .Values.master.persistence.existingClaim }}
+            claimName: {{ .Values.dataro.persistence.existingClaim }}
 {{- else }}
   volumeClaimTemplates:
     - metadata:
         name: "data"
-        {{- if .Values.master.persistence.annotations }}
-        annotations: {{- toYaml .Values.master.persistence.annotations | nindent 10 }}
+        {{- if .Values.dataro.persistence.annotations }}
+        annotations: {{- toYaml .Values.dataro.persistence.annotations | nindent 10 }}
         {{- end }}
       spec:
-        accessModes: {{- toYaml .Values.master.persistence.accessModes | nindent 10 }}
-        {{ $storage := dict "global" .Values.global "local" .Values.master }}
-        {{ include "elasticsearch.storageClass" $storage  }}
+        accessModes: {{- toYaml .Values.dataro.persistence.accessModes | nindent 10 }}
+        {{ $storage := dict "global" .Values.global "local" .Values.dataro }}
+        {{ include "elasticsearch.storageClass" $storage }}
         resources:
           requests:
-            storage: {{ .Values.master.persistence.size | quote }}
-        {{- if .Values.master.persistence.selector }}
-        selector: {{- include "common.tplvalues.render" (dict "value" .Values.master.persistence.selector "context" $) | nindent 10 }}
-        {{- else if .Values.master.persistence.existingVolume }}
+            storage: {{ .Values.dataro.persistence.size | quote }}
+        {{- if .Values.dataro.persistence.selector }}
+        selector: {{- include "common.tplvalues.render" (dict "value" .Values.dataro.persistence.selector "context" $) | nindent 10 }}
+        {{- else if .Values.dataro.persistence.existingVolume }}
         selector:
           matchLabels:
-            volume: {{ .Values.master.persistence.existingVolume }}
+            volume: {{ .Values.dataro.persistence.existingVolume }}
         {{- end }}
 {{- end }}

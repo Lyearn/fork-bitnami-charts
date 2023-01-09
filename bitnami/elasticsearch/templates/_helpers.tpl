@@ -59,10 +59,12 @@ Return the hostname of every ElasticSearch seed node
 {{- $masterFullname := include "elasticsearch.master.fullname" . }}
 {{- $coordinatingFullname := include "elasticsearch.coordinating.fullname" . }}
 {{- $dataFullname := include "elasticsearch.data.fullname" . }}
+{{- $dataroFullname := include "elasticsearch.dataro.fullname" . }}
 {{- $ingestFullname := include "elasticsearch.ingest.fullname" . }}
 {{- $masterFullname }}.{{ $releaseNamespace }}.svc.{{ $clusterDomain }},
 {{- $coordinatingFullname }}.{{ $releaseNamespace }}.svc.{{ $clusterDomain }},
 {{- $dataFullname }}.{{ $releaseNamespace }}.svc.{{ $clusterDomain }},
+{{- $dataroFullname }}.{{ $releaseNamespace }}.svc.{{ $clusterDomain }},
 {{- if .Values.ingest.enabled }}
 {{- $ingestFullname }}.{{ $releaseNamespace }}.svc.{{ $clusterDomain }},
 {{- end -}}
@@ -77,6 +79,18 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- .Values.data.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-%s" (include "common.names.fullname" .) .Values.data.name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a default fully qualified dataro name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "elasticsearch.dataro.fullname" -}}
+{{- if .Values.dataro.fullnameOverride -}}
+{{- .Values.dataro.fullnameOverride | trunc 61 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" (include "common.names.fullname" .) .Values.dataro.name | trunc 61 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 
@@ -134,6 +148,17 @@ Get the initialization scripts Secret name.
     {{ default (include "elasticsearch.data.fullname" .) .Values.data.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.data.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+ Create the name of the data service account to use
+ */}}
+{{- define "elasticsearch.dataro.serviceAccountName" -}}
+{{- if .Values.dataro.serviceAccount.create -}}
+    {{ default (include "elasticsearch.dataro.fullname" .) .Values.dataro.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.dataro.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
 
@@ -282,6 +307,18 @@ Return the elasticsearch TLS credentials secret for data nodes.
     {{- printf "%s" (tpl $secretName $) -}}
 {{- else -}}
     {{- printf "%s-crt" (include "elasticsearch.data.fullname" .) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the elasticsearch TLS credentials secret for data nodes.
+*/}}
+{{- define "elasticsearch.dataro.tlsSecretName" -}}
+{{- $secretName := .Values.security.tls.dataro.existingSecret -}}
+{{- if $secretName -}}
+    {{- printf "%s" (tpl $secretName $) -}}
+{{- else -}}
+    {{- printf "%s-crt" (include "elasticsearch.dataro.fullname" .) -}}
 {{- end -}}
 {{- end -}}
 
