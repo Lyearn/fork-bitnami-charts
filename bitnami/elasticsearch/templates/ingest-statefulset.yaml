@@ -123,7 +123,7 @@ spec:
             - name: ELASTICSEARCH_CLUSTER_HOSTS
               value: {{ include "elasticsearch.hosts" . | quote }}
             - name: ELASTICSEARCH_TOTAL_NODES
-              value: {{ add (ternary .Values.master.autoscaling.minReplicas .Values.master.replicas (eq .Values.master.autoscaling.enabled true)) (ternary .Values.data.autoscaling.minReplicas .Values.data.replicas (eq .Values.data.autoscaling.enabled true)) | quote }}
+              value: {{ add (ternary .Values.master.autoscaling.minReplicas .Values.master.replicas (eq .Values.master.autoscaling.enabled true)) (ternary .Values.data.autoscaling.minReplicas .Values.data.replicas (eq .Values.data.autoscaling.enabled true)) (ternary .Values.dataro.autoscaling.minReplicas .Values.dataro.replicas (eq .Values.dataro.autoscaling.enabled true)) | quote }}
             - name: ELASTICSEARCH_CLUSTER_MASTER_HOSTS
               {{- $elasticsearchMasterFullname := include "elasticsearch.master.fullname" . }}
               {{- $replicas := int (ternary .Values.master.autoscaling.minReplicas .Values.master.replicas (eq .Values.master.autoscaling.enabled true)) }}
