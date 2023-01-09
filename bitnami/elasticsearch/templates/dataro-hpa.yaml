@@ -1,0 +1,35 @@
+{{- if .Values.dataro.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "elasticsearch.dataro.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: data
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: {{ template "common.capabilities.statefulset.apiVersion" . }}
+    kind: StatefulSet
+    name: {{ include "elasticsearch.dataro.fullname" . }}
+  minReplicas: {{ .Values.dataro.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.dataro.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.dataro.autoscaling.targetCPU }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.dataro.autoscaling.targetCPU }}
+    {{- end }}
+    {{- if .Values.dataro.autoscaling.targetMemory }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.dataro.autoscaling.targetMemory }}
+    {{- end }}
+{{- end }}
