@@ -1057,6 +1057,301 @@ data:
     targetCPU: ""
     targetMemory: ""
 
+## @section Dataro-only nodes parameters
+
+dataro:
+  ## @param data.replicaCount Number of data-only replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param data.nameOverride String to partially override elasticsearch.data.fullname
+  ##
+  nameOverride: ""
+  ## @param data.fullnameOverride String to fully override elasticsearch.data.fullname
+  ##
+  fullnameOverride: ""
+  ## @param data.servicenameOverride String to fully override elasticsearch.data.servicename
+  ##
+  servicenameOverride: ""
+  ## @param data.annotations [object] Annotations for the data statefulset
+  ##
+  annotations: {}
+  ## @param data.updateStrategy.type Data-only nodes statefulset stategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
+  updateStrategy:
+    type: RollingUpdate
+  ## Elasticsearch resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ## @param data.resources.limits The resources limits for the data containers
+  ## @param data.resources.requests [object] The requested resources for the data containers
+  ##
+  resources:
+    limits: {}
+    requests:
+      cpu: 25m
+      memory: 2048Mi
+  ## @param data.heapSize Elasticsearch data node heap size.
+  ## Note: The recommended heapSize is half of the container's memory.
+  ## If omitted, it will be automatically set.
+  ## Example:
+  ##   heapSize: 128m
+  ##
+  heapSize: 1024m
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param data.podSecurityContext.enabled Enabled data pods' Security Context
+  ## @param data.podSecurityContext.fsGroup Set data pod's Security Context fsGroup
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param data.containerSecurityContext.enabled Enabled data containers' Security Context
+  ## @param data.containerSecurityContext.runAsUser Set data containers' Security Context runAsUser
+  ## @param data.containerSecurityContext.runAsNonRoot Set data containers' Security Context runAsNonRoot
+  ##
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+    runAsNonRoot: true
+  ## @param data.hostAliases data pods host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  ## @param data.podLabels Extra labels for data pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param data.podAnnotations Annotations for data pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param data.podAffinityPreset Pod affinity preset. Ignored if `data.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAffinityPreset: ""
+  ## @param data.podAntiAffinityPreset Pod anti-affinity preset. Ignored if `data.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAntiAffinityPreset: ""
+  ## Node data.affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+  ##
+  nodeAffinityPreset:
+    ## @param data.nodeAffinityPreset.type Node affinity preset type. Ignored if `data.affinity` is set. Allowed values: `soft` or `hard`
+    ##
+    type: ""
+    ## @param data.nodeAffinityPreset.key Node label key to match. Ignored if `data.affinity` is set
+    ##
+    key: ""
+    ## @param data.nodeAffinityPreset.values Node label values to match. Ignored if `data.affinity` is set
+    ## E.g.
+    ## values:
+    ##   - e2e-az1
+    ##   - e2e-az2
+    ##
+    values: []
+  ## @param data.affinity Affinity for data pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## NOTE: `data.podAffinityPreset`, `data.podAntiAffinityPreset`, and `data.nodeAffinityPreset` will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param data.nodeSelector Node labels for data pods assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+  ## @param data.tolerations Tolerations for data pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## @param data.priorityClassName data pods' priorityClassName
+  ##
+  priorityClassName: ""
+  ## @param data.schedulerName Name of the k8s scheduler (other than default) for data pods
+  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  schedulerName: ""
+  ## @param data.terminationGracePeriodSeconds In seconds, time the given to the Elasticsearch data pod needs to terminate gracefully
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods
+  ##
+  terminationGracePeriodSeconds: ""
+  ## @param data.topologySpreadConstraints Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods
+  ##
+  topologySpreadConstraints: []
+  ## @param data.podManagementPolicy podManagementPolicy to manage scaling operation of Elasticsearch data pods
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies
+  ##
+  podManagementPolicy: "Parallel"
+  ## Configure extra options for Elasticsearch data containers' liveness, readiness and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param data.startupProbe.enabled Enable/disable the startup probe (data nodes pod)
+  ## @param data.startupProbe.initialDelaySeconds Delay before startup probe is initiated (data nodes pod)
+  ## @param data.startupProbe.periodSeconds How often to perform the probe (data nodes pod)
+  ## @param data.startupProbe.timeoutSeconds When the probe times out (data nodes pod)
+  ## @param data.startupProbe.successThreshold Minimum consecutive successes for the probe to be considered successful after having failed (data nodes pod)
+  ## @param data.startupProbe.failureThreshold Minimum consecutive failures for the probe to be considered failed after having succeeded
+  ##
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 90
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 5
+  ## @param data.livenessProbe.enabled Enable/disable the liveness probe (data nodes pod)
+  ## @param data.livenessProbe.initialDelaySeconds Delay before liveness probe is initiated (data nodes pod)
+  ## @param data.livenessProbe.periodSeconds How often to perform the probe (data nodes pod)
+  ## @param data.livenessProbe.timeoutSeconds When the probe times out (data nodes pod)
+  ## @param data.livenessProbe.successThreshold Minimum consecutive successes for the probe to be considered successful after having failed (data nodes pod)
+  ## @param data.livenessProbe.failureThreshold Minimum consecutive failures for the probe to be considered failed after having succeeded
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 90
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 5
+  ## @param data.readinessProbe.enabled Enable/disable the readiness probe (data nodes pod)
+  ## @param data.readinessProbe.initialDelaySeconds Delay before readiness probe is initiated (data nodes pod)
+  ## @param data.readinessProbe.periodSeconds How often to perform the probe (data nodes pod)
+  ## @param data.readinessProbe.timeoutSeconds When the probe times out (data nodes pod)
+  ## @param data.readinessProbe.successThreshold Minimum consecutive successes for the probe to be considered successful after having failed (data nodes pod)
+  ## @param data.readinessProbe.failureThreshold Minimum consecutive failures for the probe to be considered failed after having succeeded
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 90
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 5
+  ## @param data.customStartupProbe Override default startup probe
+  ##
+  customStartupProbe: {}
+  ## @param data.customLivenessProbe Override default liveness probe
+  ##
+  customLivenessProbe: {}
+  ## @param data.customReadinessProbe Override default readiness probe
+  ##
+  customReadinessProbe: {}
+  ## @param data.command Override default container command (useful when using custom images)
+  ##
+  command: []
+  ## @param data.args Override default container args (useful when using custom images)
+  ##
+  args: []
+  ## @param data.lifecycleHooks for the data container(s) to automate configuration before or after startup
+  ##
+  lifecycleHooks: {}
+  ## @param data.extraEnvVars Array with extra environment variables to add to data nodes
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param data.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for data nodes
+  ##
+  extraEnvVarsCM: ""
+  ## @param data.extraEnvVarsSecret Name of existing Secret containing extra env vars for data nodes
+  ##
+  extraEnvVarsSecret: ""
+  ## @param data.extraVolumes Optionally specify extra list of additional volumes for the data pod(s)
+  ##
+  extraVolumes: []
+  ## @param data.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the data container(s)
+  ##
+  extraVolumeMounts: []
+  ## @param data.sidecars Add additional sidecar containers to the data pod(s)
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## @param data.initContainers Add additional init containers to the data pod(s)
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: []
+  ## Enable persistence using Persistent Volume Claims
+  ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+  ##
+  persistence:
+    ## @param data.persistence.enabled Enable persistence using a `PersistentVolumeClaim`
+    ##
+    enabled: true
+    ## @param data.persistence.storageClass Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: ""
+    ## @param data.persistence.existingClaim Existing Persistent Volume Claim
+    ## then accept the value as an existing Persistent Volume Claim to which
+    ## the container should be bound
+    ##
+    existingClaim: ""
+    ## @param data.persistence.existingVolume Existing Persistent Volume for use as volume match label selector to the `volumeClaimTemplate`. Ignored when `data.persistence.selector` is set.
+    ##
+    existingVolume: ""
+    ## @param data.persistence.selector Configure custom selector for existing Persistent Volume. Overwrites `data.persistence.existingVolume`
+    ## selector:
+    ##   matchLabels:
+    ##     volume:
+    ##
+    selector: {}
+    ## @param data.persistence.annotations Persistent Volume Claim annotations
+    ##
+    annotations: {}
+    ## @param data.persistence.accessModes Persistent Volume Access Modes
+    ##
+    accessModes:
+      - ReadWriteOnce
+    ## @param data.persistence.size Persistent Volume Size
+    ##
+    size: 8Gi
+  ## Pods Service Account
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ## @param data.serviceAccount.create Specifies whether a ServiceAccount should be created
+  ## @param data.serviceAccount.name Name of the service account to use. If not set and create is true, a name is generated using the fullname template.
+  ## @param data.serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+  ## @param data.serviceAccount.annotations Annotations for service account. Evaluated as a template. Only used if `create` is `true`.
+  ##
+  serviceAccount:
+    create: false
+    name: ""
+    automountServiceAccountToken: true
+    annotations: {}
+  ## Enable HorizontalPodAutoscaler for Elasticsearch data pods
+  ## ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+  ## @param data.autoscaling.enabled Whether enable horizontal pod autoscale
+  ## @param data.autoscaling.minReplicas Configure a minimum amount of pods
+  ## @param data.autoscaling.maxReplicas Configure a maximum amount of pods
+  ## @param data.autoscaling.targetCPU Define the CPU target to trigger the scaling actions (utilization percentage)
+  ## @param data.autoscaling.targetMemory Define the memory target to trigger the scaling actions (utilization percentage)
+  ##
+  autoscaling:
+    enabled: false
+    minReplicas: 3
+    maxReplicas: 11
+    targetCPU: ""
+    targetMemory: ""
+
 ## @section Coordinating-only nodes parameters
 
 coordinating:

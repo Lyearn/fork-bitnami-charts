@@ -130,6 +130,19 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Create a default fully qualified dataro name.
+We truncate at 61 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "elasticsearch.dataro.fullname" -}}
+{{- $name := default "dataro" .Values.dataro.nameOverride -}}
+{{- if .Values.dataro.fullnameOverride -}}
+{{- .Values.dataro.fullnameOverride | trunc 61 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" (include "common.names.fullname" .) $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Create a default data service name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
@@ -138,6 +151,18 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- .Values.data.servicenameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-hl" (include "elasticsearch.data.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a default dataro service name.
+We truncate at 61 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "elasticsearch.dataro.servicename" -}}
+{{- if .Values.dataro.servicenameOverride -}}
+{{- .Values.dataro.servicenameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-hl" (include "elasticsearch.dataro.fullname" .) | trunc 61 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 
@@ -207,6 +232,15 @@ Returns true if at least one data-only node replica has been configured.
 {{- end -}}
 
 {{/*
+Returns true if at least one dataro-only node replica has been configured.
+*/}}
+{{- define "elasticsearch.dataro.enabled" -}}
+{{- if or .Values.dataro.autoscaling.enabled (gt (int .Values.dataro.replicaCount) 0) -}}
+    {{- true -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Returns true if at least one ingest-only node replica has been configured.
 */}}
 {{- define "elasticsearch.ingest.enabled" -}}
@@ -232,6 +266,10 @@ Return the hostname of every ElasticSearch seed node
 {{- if (include "elasticsearch.data.enabled" .) -}}
 {{- $dataFullname := include "elasticsearch.data.servicename" .}}
 {{- $dataFullname }}.{{ $releaseNamespace }}.svc.{{ $clusterDomain }},
+{{- end -}}
+{{- if (include "elasticsearch.dataro.enabled" .) -}}
+{{- $dataroFullname := include "elasticsearch.dataro.servicename" .}}
+{{- $dataroFullname }}.{{ $releaseNamespace }}.svc.{{ $clusterDomain }},
 {{- end -}}
 {{- if (include "elasticsearch.ingest.enabled" .) -}}
 {{- $ingestFullname := include "elasticsearch.ingest.servicename" .}}
@@ -297,6 +335,17 @@ Get the initialization scripts Secret name.
 {{- end -}}
 
 {{/*
+ Create the name of the dataro service account to use
+ */}}
+{{- define "elasticsearch.dataro.serviceAccountName" -}}
+{{- if .Values.dataro.serviceAccount.create -}}
+    {{ default (include "elasticsearch.dataro.fullname" .) .Values.dataro.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.dataro.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
  Create the name of the ingest service account to use
  */}}
 {{- define "elasticsearch.ingest.serviceAccountName" -}}
@@ -328,6 +377,18 @@ Return the elasticsearch TLS credentials secret for data nodes.
     {{- printf "%s" (tpl $secretName $) -}}
 {{- else -}}
     {{- printf "%s-crt" (include "elasticsearch.data.fullname" .) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the elasticsearch TLS credentials secret for dataro nodes.
+*/}}
+{{- define "elasticsearch.dataro.tlsSecretName" -}}
+{{- $secretName := .Values.security.tls.dataro.existingSecret -}}
+{{- if $secretName -}}
+    {{- printf "%s" (tpl $secretName $) -}}
+{{- else -}}
+    {{- printf "%s-crt" (include "elasticsearch.dataro.fullname" .) -}}
 {{- end -}}
 {{- end -}}
 
@@ -486,8 +547,9 @@ Returns true if at least 1 existing secret was provided
 {{- $masterSecret := (and (include "elasticsearch.master.enabled" .) .Values.security.tls.master.existingSecret) -}}
 {{- $coordinatingSecret := (and (include "elasticsearch.coordinating.enabled" .) .Values.security.tls.coordinating.existingSecret) -}}
 {{- $dataSecret := (and (include "elasticsearch.data.enabled" .) .Values.security.tls.data.existingSecret) -}}
+{{- $dataroSecret := (and (include "elasticsearch.dataro.enabled" .) .Values.security.tls.dataro.existingSecret) -}}
 {{- $ingestSecret := (and (include "elasticsearch.ingest.enabled" .) .Values.security.tls.ingest.existingSecret) -}}
-{{- if or $masterSecret $coordinatingSecret $dataSecret $ingestSecret }}
+{{- if or $masterSecret $coordinatingSecret $dataSecret $dataroSecret $ingestSecret }}
     {{- true -}}
 {{- end -}}
 {{- end -}}
@@ -522,6 +584,16 @@ elasticsearch: security.tls.data.existingSecret
 {{- end -}}
 {{- end -}}
 
+{{/* Validate values of Elasticsearch - Existing secret not provided for data nodes */}}
+{{- define "elasticsearch.validateValues.security.missingTlsSecrets.dataro" -}}
+{{- $dataSecret := (and (include "elasticsearch.dataro.enabled" .) (not .Values.security.tls.dataro.existingSecret)) -}}
+{{- if and .Values.security.enabled (include "elasticsearch.security.tlsSecretsProvided" .) $dataSecret -}}
+elasticsearch: security.tls.dataro.existingSecret
+    Missing secret containing the TLS certificates for the Elasticsearch data nodes.
+    Provide the certificates using --set .Values.security.tls.dataro.existingSecret="my-secret".
+{{- end -}}
+{{- end -}}
+
 {{/* Validate values of Elasticsearch - Existing secret not provided for ingest nodes */}}
 {{- define "elasticsearch.validateValues.security.missingTlsSecrets.ingest" -}}
 {{- $ingestSecret := (and (include "elasticsearch.ingest.enabled" .) (not .Values.security.tls.ingest.existingSecret)) -}}
@@ -542,7 +614,7 @@ elasticsearch: security.tls
         - Provide an existing secret containing the PEM certificates for each role and enable `security.tls.usePemCerts=true`
         - Enable using auto-generated certificates with `security.tls.autoGenerated=true`
     Existing secrets containing either JKS/PKCS12 or PEM certificates can be provided using --set Values.security.tls.master.existingSecret=master-certs,
-    --set Values.security.tls.data.existingSecret=data-certs, --set Values.security.tls.coordinating.existingSecret=coordinating-certs, --set Values.security.tls.ingest.existingSecret=ingest-certs
+    --set Values.security.tls.data.existingSecret=data-certs, --set Values.security.tls.dataro.existingSecret=data-certs, --set Values.security.tls.coordinating.existingSecret=coordinating-certs, --set Values.security.tls.ingest.existingSecret=ingest-certs
 {{- end -}}
 {{- end -}}
 
