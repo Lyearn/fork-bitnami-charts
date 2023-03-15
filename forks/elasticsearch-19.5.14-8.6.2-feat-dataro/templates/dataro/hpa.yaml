@@ -1,0 +1,47 @@
+{{- if and (include "elasticsearch.dataro.enabled" .) .Values.dataro.autoscaling.enabled }}
+apiVersion: {{ include "common.capabilities.hpa.apiVersion" ( dict "context" $ ) }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "elasticsearch.dataro.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: data
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: {{ template "common.capabilities.statefulset.apiVersion" . }}
+    kind: StatefulSet
+    name: {{ include "elasticsearch.dataro.fullname" . }}
+  minReplicas: {{ .Values.dataro.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.dataro.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.dataro.autoscaling.targetCPU }}
+    - type: Resource
+      resource:
+        name: cpu
+        {{- if semverCompare "<1.23-0" (include "common.capabilities.kubeVersion" .) }}
+        targetAverageUtilization: {{ .Values.dataro.autoscaling.targetCPU }}
+        {{- else }}
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.dataro.autoscaling.targetCPU }}
+        {{- end }}
+    {{- end }}
+    {{- if .Values.dataro.autoscaling.targetMemory }}
+    - type: Resource
+      resource:
+        name: memory
+        {{- if semverCompare "<1.23-0" (include "common.capabilities.kubeVersion" .) }}
+        targetAverageUtilization: {{ .Values.dataro.autoscaling.targetMemory }}
+        {{- else }}
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.dataro.autoscaling.targetMemory }}
+        {{- end }}
+    {{- end }}
+{{- end }}
