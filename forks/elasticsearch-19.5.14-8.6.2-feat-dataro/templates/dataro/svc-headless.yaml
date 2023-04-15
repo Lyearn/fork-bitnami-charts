@@ -5,7 +5,7 @@ metadata:
   name: {{ include "elasticsearch.dataro.servicename" . }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: data
+    app.kubernetes.io/component: dataro
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
     {{- end }}
@@ -23,5 +23,5 @@ spec:
       port: {{ .Values.containerPorts.transport }}
       targetPort: transport
   selector: {{- include "common.labels.matchLabels" . | nindent 4 }}
-    app.kubernetes.io/component: data
+    app.kubernetes.io/component: dataro
 {{- end }}

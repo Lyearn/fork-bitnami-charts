@@ -5,10 +5,10 @@ metadata:
   name: {{ include "elasticsearch.dataro.fullname" . }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: data
+    app.kubernetes.io/component: dataro
     {{- if .Values.useIstioLabels }}
     ## Istio Labels: https://istio.io/docs/ops/deployment/requirements/
-    app: data
+    app: dataro
     {{- end }}
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
@@ -29,7 +29,7 @@ spec:
   podManagementPolicy: {{ .Values.dataro.podManagementPolicy }}
   selector:
     matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
-      app.kubernetes.io/component: data
+      app.kubernetes.io/component: dataro
   serviceName: {{ include "elasticsearch.dataro.servicename" . }}
   {{- if .Values.dataro.updateStrategy }}
   updateStrategy: {{- toYaml .Values.dataro.updateStrategy | nindent 4 }}
@@ -37,10 +37,10 @@ spec:
   template:
     metadata:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
-        app.kubernetes.io/component: data
+        app.kubernetes.io/component: dataro
         {{- if .Values.useIstioLabels }}
         ## Istio Labels: https://istio.io/docs/ops/deployment/requirements/
-        app: data
+        app: dataro
         {{- end }}
         {{- if .Values.dataro.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.dataro.podLabels "context" $) | nindent 8 }}
@@ -62,8 +62,8 @@ spec:
       affinity: {{- include "common.tplvalues.render" (dict "value" .Values.dataro.affinity "context" $) | nindent 8 }}
       {{- else }}
       affinity:
-        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.dataro.podAffinityPreset "component" "data" "context" $) | nindent 10 }}
-        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.dataro.podAntiAffinityPreset "component" "data" "context" $) | nindent 10 }}
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.dataro.podAffinityPreset "component" "dataro" "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.dataro.podAntiAffinityPreset "component" "dataro" "context" $) | nindent 10 }}
         nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.dataro.nodeAffinityPreset.type "key" .Values.dataro.nodeAffinityPreset.key "values" .Values.dataro.nodeAffinityPreset.values) | nindent 10 }}
       {{- end }}
       {{- if .Values.dataro.nodeSelector }}
@@ -161,6 +161,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            - name: MY_COMPONENT_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.labels['app.kubernetes.io/component']
             - name: ELASTICSEARCH_IS_DEDICATED_NODE
               value: "yes"
             - name: ELASTICSEARCH_NODE_ROLES
@@ -195,6 +200,8 @@ spec:
             - name: ELASTICSEARCH_HEAP_SIZE
               value: {{ .Values.dataro.heapSize | quote }}
             {{- end }}
+            - name: ELASTICSEARCH_NODE_ATTRIBUTE_PURPOSE
+              value: $(MY_COMPONENT_NAME)
             {{- if .Values.security.enabled }}
             {{- include "elasticsearch.configure.security" . | nindent 12 }}
             {{- end }}

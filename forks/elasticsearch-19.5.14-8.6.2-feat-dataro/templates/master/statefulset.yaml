@@ -161,6 +161,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            - name: MY_COMPONENT_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.labels['app.kubernetes.io/component']
             - name: ELASTICSEARCH_IS_DEDICATED_NODE
               value: {{ ternary "yes" "no" .Values.master.masterOnly | quote }}
             - name: ELASTICSEARCH_NODE_ROLES
@@ -195,6 +200,8 @@ spec:
             - name: ELASTICSEARCH_HEAP_SIZE
               value: {{ .Values.master.heapSize | quote }}
             {{- end }}
+            - name: ELASTICSEARCH_NODE_ATTRIBUTE_PURPOSE
+              value: $(MY_COMPONENT_NAME)
             {{- if .Values.security.enabled }}
             {{- include "elasticsearch.configure.security" . | nindent 12 }}
             {{- end }}

@@ -139,6 +139,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            - name: MY_COMPONENT_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.labels['app.kubernetes.io/component']
             - name: BITNAMI_DEBUG
               value: {{ ternary "true" "false" (or .Values.image.debug .Values.diagnosticMode.enabled) | quote }}
             - name: ELASTICSEARCH_CLUSTER_NAME
@@ -171,6 +176,8 @@ spec:
             - name: ELASTICSEARCH_HEAP_SIZE
               value: {{ .Values.coordinating.heapSize | quote }}
             {{- end }}
+            - name: ELASTICSEARCH_NODE_ATTRIBUTE_PURPOSE
+              value: $(MY_COMPONENT_NAME)
             {{- if .Values.security.enabled }}
             {{- include "elasticsearch.configure.security" . | nindent 12 }}
             {{- end }}
