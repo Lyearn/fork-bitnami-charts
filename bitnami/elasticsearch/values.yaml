@@ -253,6 +253,8 @@ security:
       existingSecret: ""
     coordinating:
       existingSecret: ""
+    dataro:
+      existingSecret: ""
     ## @param security.tls.keystoreFilename Name of the keystore file
     ##
     keystoreFilename: elasticsearch.keystore.jks
